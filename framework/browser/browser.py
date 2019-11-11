@@ -34,6 +34,10 @@ class Browser(metaclass=Singleton):
         debug("Close tab")
         self.driver.close()
 
+    def quit(self):
+        debug("Close browser")
+        self.driver.quit()
+
     def get_current_url(self) -> str:
         debug("Get current browser")
         return self.driver.current_url

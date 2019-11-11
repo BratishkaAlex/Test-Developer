@@ -35,7 +35,7 @@ def get_browser_options(browser: str):
         return chrome_options
     elif browser == "firefox":
         firefox_options = webdriver.FirefoxOptions()
-        firefox_options.headless = True
+        firefox_options.add_argument("--headless")
         firefox_options.set_preference("intl.accept_languages", str(config.LANGUAGE))
         return firefox_options
 

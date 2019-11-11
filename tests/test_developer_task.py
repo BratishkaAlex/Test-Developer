@@ -34,6 +34,9 @@ class TestDeveloperTask:
             os.remove(config.PATH_TO_DOWNLOAD_ATTACHMENT)
         cloudinary_authorize()
 
+    def teardown_method(self):
+        self.browser.quit()
+
     @pytestrail.case("C11345486")
     def test_developer_task(self):
         with Step("Getting token by API request"):
