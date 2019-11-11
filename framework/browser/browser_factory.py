@@ -8,7 +8,7 @@ from resources import config
 
 
 def get_driver(browser):
-    if "Remote launch" in os.environ and os.environ["Remote launch"] == "true":
+    if "isRemote" in os.environ and os.environ["isRemote"] == "true":
         return get_remote_driver(browser)
     return get_local_driver(browser)
 
