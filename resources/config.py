@@ -1,14 +1,15 @@
 import logging
 import os
 
-BROWSER = "chrome"
-LANGUAGE = "ru"
 if "LOGIN" in os.environ and "PASSWORD" in os.environ:
     LOGIN = os.environ["LOGIN"]
     PASSWORD = os.environ["PASSWORD"]
 else:
     LOGIN = ""
     PASSWORD = ""
+
+BROWSER = "firefox"
+LANGUAGE = "ru"
 PORT = 8080
 API_URL = f"http://localhost:{PORT}/api"
 URL = f"http://{LOGIN}:{PASSWORD}@localhost:{PORT}/web"

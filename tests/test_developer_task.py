@@ -92,7 +92,7 @@ class TestDeveloperTask:
 
             new_project_page.add_test()
             self.browser.save_screenshot(config.PATH_TO_SAVE_SCREENSHOT)
-            new_test = Test(f"test_{get_random_string()}", TestStatuses.FAILED.value, "post", "2016-10-13 09:50:47.0",
+            new_test = Test(f"test_{get_random_string()}", TestStatuses.FAILED.value, "post", "2016-10-13 09:50:49.0",
                             "2016-10-13 10:01:43.0", "ubuntu",
                             config.BROWSER, abspath(config.PATH_TO_SAVE_SCREENSHOT))
             new_project_page.add_test_form.enter_required_information(new_test)

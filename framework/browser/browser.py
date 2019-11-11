@@ -4,7 +4,7 @@ import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-from framework.browser.browser_factory import get_driver, get_remote_driver
+from framework.browser.browser_factory import get_driver
 from framework.models.cookie import Cookie
 from framework.models.singleton import Singleton
 from framework.utils.logger import debug
@@ -78,5 +78,6 @@ class Browser(metaclass=Singleton):
         self.driver.get_screenshot_as_file(path_to_save_screenshot)
 
     def click_by_coordinates(self, x: int, y: int):
+        time.sleep(1)
         action = webdriver.ActionChains(self.driver)
         action.move_by_offset(x, y).click().perform()
