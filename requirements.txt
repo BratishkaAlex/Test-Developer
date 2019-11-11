@@ -1,0 +1,8 @@
+pytest==5.2.1
+requests==2.22.0
+selenium==3.141.0
+webdriver_manager==2.2.0
+Pillow==6.2.0
+cloudinary==1.18.2
+pytest-testrail==2.8.3
+pytest-html==2.0.0
