@@ -25,9 +25,9 @@ class Case(BaseApi):
     def get(self, case_id):
         return CaseResponse(self.get_request(Case.METHOD_GET, case_id).json())
 
-    def add_result(self, run_id, case_id, result_status_id):
+    def add_result(self, run_id: int, case_id: int, comment: str):
         data = {
-            "status_id": result_status_id
+            "comment": comment
         }
         self.post_request(Case.METHOD_ADD_RESULT, f"{run_id}/{case_id}", data)
 

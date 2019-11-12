@@ -8,7 +8,14 @@ else:
     LOGIN = ""
     PASSWORD = ""
 
-BROWSER = "firefox"
+if "TEST_RAIL_LOGIN" in os.environ and "TEST_RAIL_PASSWORD" in os.environ:
+    TEST_RAIL_LOGIN = os.environ["TEST_RAIL_LOGIN"]
+    TEST_RAIL_PASSWORD = os.environ["TEST_RAIL_PASSWORD"]
+else:
+    TEST_RAIL_LOGIN = ""
+    TEST_RAIL_PASSWORD = ""
+
+BROWSER = "chrome"
 LANGUAGE = "ru"
 PORT = 8080
 API_URL = f"http://localhost:{PORT}/api"
@@ -20,6 +27,10 @@ REMOTE_FIREFOX_VERSION = 61.0
 TIMEOUT = 10
 VARIANT = 2
 PROJECT = "Nexage"
+TEST_RAIL_URL = "https://tr.a1qa.com"
+TEST_RAIL_API_URL = "index.php?api/v2"
+TEST_RAIL_RUN_ID = 31131
+TEST_RAIL_CASE_ID = 11345486
 PATH_TO_SAVE_SCREENSHOT = "resources/screenshot.png"
 PATH_TO_DOWNLOAD_ATTACHMENT = "resources/download.png"
 LOGGING_LEVEL = logging.INFO

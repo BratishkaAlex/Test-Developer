@@ -12,6 +12,7 @@ from app.page_object.pages.all_projects_page import AllProjectsPage
 from app.page_object.pages.project_page import ProjectPage
 from framework.browser.browser import Browser
 from framework.models.cookie import Cookie
+from framework.test_rail_api.models.user_session import UserSession
 from framework.utils.cloudinary_utils import cloudinary_authorize
 from framework.utils.logger import Step
 from framework.utils.random_utils import get_random_string
@@ -24,6 +25,7 @@ class TestDeveloperTask:
     browser = Browser()
     START_TIME_COLUMN_NAME = "Latest test start time"
     TEST_NAME_COLUMN_NAME = "Test name"
+    test_rail_user_session = UserSession(config.TEST_RAIL_LOGIN, config.TEST_RAIL_PASSWORD)
 
     def setup_method(self):
         self.browser.maximize()
@@ -92,7 +94,7 @@ class TestDeveloperTask:
 
             new_project_page.add_test()
             self.browser.save_screenshot(config.PATH_TO_SAVE_SCREENSHOT)
-            new_test = Test(f"test_{get_random_string()}", TestStatuses.FAILED.value, "post", "2016-10-13 09:50:49.0",
+            new_test = Test(f"test_{get_random_string()}", TestStatuses.FAILED.value, "post", "2016-10-13 09:52:49.0",
                             "2016-10-13 10:01:43.0", "ubuntu",
                             config.BROWSER, abspath(config.PATH_TO_SAVE_SCREENSHOT))
             new_project_page.add_test_form.enter_required_information(new_test)
@@ -111,3 +113,6 @@ class TestDeveloperTask:
             screenshot_public_id = f"screenshot_{get_random_string()}"
             uploaded_screenshot_link = upload_screenshot_on_cloudinary(config.PATH_TO_SAVE_SCREENSHOT,
                                                                        screenshot_public_id)
+            self.test_rail_user_session.case.add_result(config.TEST_RAIL_RUN_ID,
+                                                        config.TEST_RAIL_CASE_ID,
+                                                        uploaded_screenshot_link)
