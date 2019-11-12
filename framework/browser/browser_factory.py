@@ -35,10 +35,8 @@ def get_browser_options(browser: str):
         return chrome_options
     elif browser == "firefox":
         firefox_options = webdriver.FirefoxOptions()
-        firefox_options.add_argument("--headless")
-        firefox_options.add_argument('--disable-dev-shm-usage')
-        firefox_options.add_argument('--no-sandbox')
         firefox_options.set_preference("intl.accept_languages", str(config.LANGUAGE))
+        firefox_options.headless = True
         return firefox_options
 
 
