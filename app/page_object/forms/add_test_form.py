@@ -38,5 +38,4 @@ class AddTestForm:
         self.__save_test_button.click()
 
     def is_test_added_successfully(self) -> bool:
-        self.__success_message.wait_for_element_visibility()
         return self.__success_message.is_displayed()

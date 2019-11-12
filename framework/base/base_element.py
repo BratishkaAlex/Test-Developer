@@ -19,6 +19,7 @@ class BaseElement:
         debug(f"Creating instance of {self.__name}")
 
     def is_displayed(self) -> bool:
+        self.wait_for_element_visibility()
         return self.web_element.is_displayed()
 
     def click(self):
