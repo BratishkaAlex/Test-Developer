@@ -1,5 +1,6 @@
 import os
 import time
+from typing import Tuple
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -69,15 +70,18 @@ class Browser(metaclass=Singleton):
     def back(self):
         self.driver.back()
 
-    def switch_to_window(self, window_number: int):
+    def get_windows_count(self) -> int:
         time.sleep(1)
+        return len(self.driver.window_handles)
+
+    def switch_to_window(self, window_number: int):
         self.driver.switch_to.window(self.driver.window_handles[window_number])
 
     def save_screenshot(self, path_to_save_screenshot: str):
         debug("Make screenshot")
         self.driver.get_screenshot_as_file(path_to_save_screenshot)
 
-    def click_by_coordinates(self, x: int, y: int):
+    def click_by_coordinates(self, x_y: Tuple[int, int]):
         time.sleep(1)
         action = webdriver.ActionChains(self.driver)
-        action.move_by_offset(x, y).click().perform()
+        action.move_by_offset(x_y[0], x_y[1]).click().perform()

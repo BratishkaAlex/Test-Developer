@@ -1,6 +1,7 @@
 import os
 from os.path import abspath, exists
 
+import pytest
 from pytest_testrail.plugin import pytestrail
 
 from app.application_api.api.tests import Tests
@@ -27,26 +28,55 @@ class TestDeveloperTask:
     TEST_NAME_COLUMN_NAME = "Test name"
     test_rail_user_session = UserSession(config.TEST_RAIL_LOGIN, config.TEST_RAIL_PASSWORD)
 
-    def setup_method(self):
+    def setup_class(self):
         self.browser.maximize()
         self.browser.set_implicitly_wait(config.TIMEOUT)
+        cloudinary_authorize()
+
+    def setup_method(self):
         if exists(config.PATH_TO_SAVE_SCREENSHOT):
             os.remove(config.PATH_TO_SAVE_SCREENSHOT)
         if exists(config.PATH_TO_DOWNLOAD_ATTACHMENT):
             os.remove(config.PATH_TO_DOWNLOAD_ATTACHMENT)
-        cloudinary_authorize()
 
     def teardown_method(self):
+        with Step("Upload screenshot on cloudinary and add integration with TestRail"):
+            screenshot_public_id = f"screenshot_{get_random_string()}"
+            uploaded_screenshot_link = upload_screenshot_on_cloudinary(config.PATH_TO_SAVE_SCREENSHOT,
+                                                                       screenshot_public_id)
+            self.test_rail_user_session.case.add_result(config.TEST_RAIL_RUN_ID,
+                                                        config.TEST_RAIL_CASE_ID,
+                                                        uploaded_screenshot_link)
+
+    def teardown_class(self):
         self.browser.quit()
 
+    @pytest.mark.parametrize(
+        "token_key, x_y_coordinates, test_name, test_status, test_method, test_start_time, test_end_time,"
+        " test_environment, test_browser, test_attachment",
+        [(
+                "token",
+                (0, 0),
+                f"test_{get_random_string()}",
+                TestStatuses.FAILED.value,
+                "post",
+                "2016-10-13 09:56:49.0",
+                "2016-10-13 10:01:43.0",
+                "ubuntu",
+                config.BROWSER,
+                abspath(
+                    config.PATH_TO_SAVE_SCREENSHOT))])
     @pytestrail.case("C11345486")
-    def test_developer_task(self):
+    def test_developer_task(self, token_key, x_y_coordinates, test_name, test_status, test_method, test_start_time,
+                            test_end_time,
+                            test_environment, test_browser, test_attachment):
         with Step("Getting token by API request"):
             token = Token().get()
+            assert len(token) > 0, "Token wasn't created"
 
         with Step("Go to site, pass authorization, send cookie with token"):
             self.browser.enter_url(config.URL)
-            self.browser.add_cookie(Cookie("token", token))
+            self.browser.add_cookie(Cookie(token_key, token))
             self.browser.driver.refresh()
             all_projects_page = AllProjectsPage()
             assert all_projects_page.is_page_opened(), "Variant is not displayed"
@@ -71,6 +101,8 @@ class TestDeveloperTask:
             self.browser.back()
             all_projects_page.projects_menu.add_project()
             add_project_page = AddProjectPage()
+            assert self.browser.get_windows_count() == 2, "New tab wasn't opened"
+
             self.browser.switch_to_window(1)
             assert add_project_page.is_page_opened(), "Add project page wasn't opened"
 
@@ -81,6 +113,8 @@ class TestDeveloperTask:
                 project_name), f"There is no message about success saving of project {project_name}"
 
             self.browser.close_tab()
+            assert self.browser.get_windows_count() == 1, "New tab wasn't closed"
+
             self.browser.switch_to_window(0)
             self.browser.refresh_page()
             assert all_projects_page.projects_menu.is_project_displayed(
@@ -94,25 +128,17 @@ class TestDeveloperTask:
 
             new_project_page.add_test()
             self.browser.save_screenshot(config.PATH_TO_SAVE_SCREENSHOT)
-            new_test = Test(f"test_{get_random_string()}", TestStatuses.FAILED.value, "post", "2016-10-13 09:52:49.0",
-                            "2016-10-13 10:01:43.0", "ubuntu",
-                            config.BROWSER, abspath(config.PATH_TO_SAVE_SCREENSHOT))
+            new_test = Test(test_name, test_status, test_method, test_start_time,
+                            test_end_time, test_environment,
+                            test_browser, test_attachment)
             new_project_page.add_test_form.enter_required_information(new_test)
             new_project_page.add_test_form.submit()
             assert new_project_page.add_test_form.is_test_added_successfully(), "Success notification didn't appear"
 
-            self.browser.click_by_coordinates(0, 0)
+            self.browser.click_by_coordinates(x_y_coordinates)
             assert new_project_page.is_test_added(new_test.name), "Test wasn't added"
 
         with Step(f"Go to {new_test.name} page, check that information was entered correctly"):
             new_project_page.navigate_to_test(new_test.name)
             fetched_test = get_test_instance_from_test_page()
             assert new_test == fetched_test, "Information wasn't entered correctly"
-
-        with Step("Upload screenshot on cloudinary and add integration with TestRail"):
-            screenshot_public_id = f"screenshot_{get_random_string()}"
-            uploaded_screenshot_link = upload_screenshot_on_cloudinary(config.PATH_TO_SAVE_SCREENSHOT,
-                                                                       screenshot_public_id)
-            self.test_rail_user_session.case.add_result(config.TEST_RAIL_RUN_ID,
-                                                        config.TEST_RAIL_CASE_ID,
-                                                        uploaded_screenshot_link)
